@@ -66,10 +66,4 @@
     - assertUnique is search("True")
     - listRegexSearch is regex(item.softwareName)
   loop: "{{ apps }}"
-  register: installSoftware
-
-# Restart system if nessesary
-- name: Restart system
-  win_reboot:
-  when: installSoftware.reboot_required
 ...
