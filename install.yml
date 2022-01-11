@@ -1,0 +1,75 @@
+##./roles/install_software/tasks/install.yml
+---
+- name: set fact copy path dest
+  set_fact:
+    makeList: "{{ makeList | default ([]) + [item.copyPathDEST] }}"
+  loop: "{{ apps }}"
+
+- name: Obtain information about a folder
+  win_find:
+    paths: "{{ makeList | unique }}"
+  register: getInstallPath
+
+- name: Get installpath
+  debug:
+    msg: "{{ item.path }}"
+  loop: "{{ getInstallPath.files }}"
+  register: installPath
+
+- name: set fact win install path list
+  set_fact:
+    winInstallPathList: "{{ winInstallPathList| default ([]) + [item.msg] }}"
+  loop: "{{ installPath.results }}"
+
+- name: set fact check install path list 
+  set_fact:
+    checkInstallPathList: "{{ checkInstallPathList| default ([]) + [item.copyPathDEST + item.copyPathSRC] }}"
+  when: listRegexSearch is regex(item.softwareName)
+  loop: "{{ apps }}"
+
+- name: Uses 'combine' to update the dictionary and 'zip' to make pairs of both lists
+  set_fact:
+    eventsList: "{{ eventsList | default({}) | combine({item[0]: item[1]}) }}"
+  loop: "{{ (winInstallPathList | zip(checkInstallPathList| sort))| list }}"
+
+- name: Assert
+  assert:
+    that: item.key == item.value
+    msg: "{{ item.key }} has status {{ item.value }}"
+  loop: "{{ eventsList| dict2items }}"
+  register: assertPath
+
+- name: Check Assert
+  debug:
+    msg: "True"
+  when: item.msg == "All assertions passed"
+  loop: "{{ assertPath.results }}"
+  register: checkAssert
+
+- name: set fact assert list
+  set_fact:
+    assertList: "{{ assertList | default ([]) }} + ['{{ item.msg| default('False') }}']"
+  loop: "{{checkAssert.results}}"
+
+- name: make assert list unique
+  debug:
+    msg: "{{ assertList| unique  }}"
+  register: assertUnique
+
+- name: Install Software
+  win_package:
+    path: "{{ item.copyPathDEST }}{{ item.copyPathSRC }}"
+    product_id: " "
+    arguments: "{{ item.softwareParam }} {{ item.otherParam }}"
+    state: present
+  when: 
+    - assertUnique is search("True")
+    - listRegexSearch is regex(item.softwareName)
+  loop: "{{ apps }}"
+  register: installSoftware
+
+# Restart system if nessesary
+- name: Restart system
+  win_reboot:
+  when: installSoftware.reboot_required
+...
