@@ -1,14 +1,12 @@
 #./group_vars/all.yml
 apps:
   - softwareName: Firefox
-    softwareVersion: 95.0.2
     copyPathSRC: Mozilla-Firefox-DE.exe
     copyPathDEST: 'C:\TMP\'
     softwareParam: /SILENT
     otherParam: ''
   - softwareName: KeePass
-    softwareVersion: '2.50
-    copyPathSRC: KeePass.txt
+    copyPathSRC: KeePass-2.50-Setup.exe
     copyPathDEST: 'C:\TMP\'
     softwareParam: /VERYSILENT
     otherParam: ''
