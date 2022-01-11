@@ -1,0 +1,8 @@
+##./roles/install_software/tasks/main.yml
+---
+- import_tasks: verify_x86.yml
+- import_tasks: verify_x64.yml
+- import_tasks: check.yml
+- import_tasks: copy.yml
+- import_tasks: install.yml
+...
