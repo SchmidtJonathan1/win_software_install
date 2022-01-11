@@ -1,0 +1,19 @@
+##./roles/install_software/tasks/verify_x86.yml
+---
+- name: Test win_reg_stat x86
+  win_reg_stat:
+    path: HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall
+  register: regx32
+
+- name: loop reg progams x86
+  win_reg_stat:
+    path: HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\{{item}}
+  loop: "{{ regx32.sub_keys }}"
+  register: outputDN
+
+- name: set fact x86
+  set_fact:
+    regListx86: "{{ regListx86 | default([]) }} + ['{{ item.properties.DisplayName.value | default('Name key is not define') }}']"
+  when: item.properties.DisplayName.value is defined
+  loop: "{{ outputDN.results }}"
+...
