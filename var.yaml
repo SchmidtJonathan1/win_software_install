@@ -1,0 +1,13 @@
+apps:
+  - softwareName: Firefox
+    softwareVersion: 95.0.2
+    copyPathSRC: Mozilla-Firefox-DE.exe
+    copyPathDEST: 'C:\TMP\'
+    softwareParam: /SILENT
+    otherParam: ''
+  - softwareName: KeePass
+    softwareVersion: '2.50
+    copyPathSRC: KeePass.txt
+    copyPathDEST: 'C:\TMP\'
+    softwareParam: /VERYSILENT
+    otherParam: ''
