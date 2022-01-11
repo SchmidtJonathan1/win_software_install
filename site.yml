@@ -1,7 +1,7 @@
 #./site.yml
 ---
 - name: Main YML for windows software install
-  hosts: all
+  hosts: primary
   #become: yes
   roles:
     - name: Install windows software
