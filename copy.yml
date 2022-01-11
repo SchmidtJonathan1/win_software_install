@@ -1,0 +1,15 @@
+# ./roles/install_software/tasks/copy.yml
+---
+- name: set fact copy path list
+  set_fact:
+    copyPathList: "{{copyPathList | default ([]) + [{'copySRC': item.copyPathSRC , 'copyDEST': item.copyPathDEST}] }}"
+  when: listRegexSearch is regex(item.softwareName)
+  loop: "{{ apps }}"
+
+- name: copy file
+  win_copy:
+    src: "software/{{ item.copySRC }}"
+    dest: "{{ item.copyDEST }}"
+  loop: "{{ copyPathList }}"
+  register: winCopy
+...
