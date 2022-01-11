@@ -1,0 +1,27 @@
+# ./roles/install_software/tasks/check.yml
+## Dependencie from verifyx*.yml
+---
+- name: Check if software is not installed
+  debug:
+    msg: "{{ item.softwareName }} not installed"
+  when: 
+      - regListx86 is not regex(item.softwareName) 
+      - regListx64 is not regex(item.softwareName)
+  loop: "{{ apps }}"
+  register: notInstalled
+
+- name: set fact not installed
+  set_fact:
+      notInstalledList: "{{ notInstalledList | default ([]) }} + ['{{ item.msg| default(item.item.softwareName + ' installiert') }}']"
+  loop: "{{ notInstalled.results }}"
+
+- name: filter list only not installed
+  debug:
+    msg: "{{ notInstalledList| map('regex_search', '.*not installed') | select('string') | list }}"
+  when: notInstalledList is regex("not installed")
+  register: listRegexSearch
+
+- name: regex search list is empty cancel play
+  meta: end_host
+  when: listRegexSearch is skipped
+...
