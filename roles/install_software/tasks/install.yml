@@ -1,5 +1,6 @@
 ##./roles/install_software/tasks/install.yml
 ---
+# Hier wird als erstes eine Liste erstellt, da das win_find Modul nur Listen und keine Dicts verwenden kann.
 - name: set fact copy path dest
   set_fact:
     makeList: "{{ makeList | default ([]) + [item.copyPathDEST] }}"
@@ -16,6 +17,7 @@
   loop: "{{ getInstallPath.files }}"
   register: installPath
 
+# Zwei Listen werden für den Vergleich gebaut
 - name: set fact win install path list
   set_fact:
     winInstallPathList: "{{ winInstallPathList| default ([]) + [item.msg] }}"
@@ -32,6 +34,7 @@
     eventsList: "{{ eventsList | default({}) | combine({item[0]: item[1]}) }}"
   loop: "{{ (winInstallPathList | zip(checkInstallPathList| sort))| list }}"
 
+# Vergeleich
 - name: Assert
   assert:
     that: item.key == item.value
